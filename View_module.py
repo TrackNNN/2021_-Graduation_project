@@ -1,10 +1,9 @@
 import random
-import sys
-from PyQt5.QtCore import (QAbstractListModel, QAbstractTableModel,
-                          QModelIndex, QSize, QTimer, QVariant, Qt, pyqtSignal)
-from PyQt5.QtWidgets import (QApplication, QDialog, QHBoxLayout,
-                             QListView, QSpinBox, QStyledItemDelegate, QStyleOptionViewItem, QWidget)
 from PyQt5.QtGui import QColor, QPainter, QPixmap
+from PyQt5.QtCore import QAbstractListModel, QModelIndex, QSize, QTimer, QVariant, Qt, pyqtSignal
+from PyQt5.QtWidgets import QDialog, QHBoxLayout, QListView, QSpinBox, QStyledItemDelegate, QStyleOptionViewItem, \
+    QWidget
+import data_processing_module as data_module
 
 
 class BarGraphModel(QAbstractListModel):
@@ -30,8 +29,7 @@ class BarGraphModel(QAbstractListModel):
         return False
 
     def flags(self, index):
-        # return (QAbstractTableModel.flags(self, index)|Qt.ItemIsEditable)
-        return (QAbstractListModel.flags(self, index) | Qt.ItemIsEditable)
+        return QAbstractListModel.flags(self, index) | Qt.ItemIsEditable
 
     def setData(self, index, value, role=Qt.DisplayRole):
         row = index.row()
@@ -48,13 +46,11 @@ class BarGraphModel(QAbstractListModel):
             changed = True
         elif role == Qt.UserRole:
             self.__colors[row] = value
-            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-            #   index, index)
+            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             self.dataChanged[QModelIndex, QModelIndex].emit(index, index)
             changed = True
         if changed:
-            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-            #   index, index)
+            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             self.dataChanged[QModelIndex, QModelIndex].emit(index, index)
         return changed
 
@@ -65,11 +61,9 @@ class BarGraphModel(QAbstractListModel):
         if role == Qt.DisplayRole:
             return self.__data[row]
         if role == Qt.UserRole:
-            return QVariant(self.__colors.get(row,
-                                              QColor(Qt.red)))
+            return QVariant(self.__colors.get(row, QColor(Qt.red)))
         if role == Qt.DecorationRole:
-            color = QColor(self.__colors.get(row,
-                                             QColor(Qt.red)))
+            color = QColor(self.__colors.get(row, QColor(Qt.red)))
             pixmap = QPixmap(20, 20)
             pixmap.fill(color)
             return QVariant(pixmap)
@@ -83,9 +77,9 @@ class BarGraphDelegate(QStyledItemDelegate):
         self.maximum = maximum
 
     def paint(self, painter, option, index):
-        myoption = QStyleOptionViewItem(option)
-        myoption.displayAlignment |= (Qt.AlignRight | Qt.AlignVCenter)
-        QStyledItemDelegate.paint(self, painter, myoption, index)
+        my_option = QStyleOptionViewItem(option)
+        my_option.displayAlignment |= (Qt.AlignRight | Qt.AlignVCenter)
+        QStyledItemDelegate.paint(self, painter, my_option, index)
 
     def createEditor(self, parent, option, index):
         spinbox = QSpinBox(parent)
@@ -111,11 +105,7 @@ class BarGraphView(QWidget):
 
     def setModel(self, model):
         self.model = model
-        # self.connect(self.model,
-        #  SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-        #  self.update)
         self.model.dataChanged[QModelIndex, QModelIndex].connect(self.update)
-        # self.connect(self.model, SIGNAL("modelReset()"), self.update)
         self.model.modelReset.connect(self.update)
 
     def sizeHint(self):
@@ -152,8 +142,8 @@ class MainForm(QDialog):
         self.listView.setModel(self.model)
         self.listView.setItemDelegate(BarGraphDelegate(0, 1000, self))
         self.listView.setMaximumWidth(100)
-        self.listView.setEditTriggers(QListView.DoubleClicked |
-                                      QListView.EditKeyPressed)
+        self.listView.setEditTriggers(QListView.DoubleClicked | QListView.EditKeyPressed)
+
         layout = QHBoxLayout()
         layout.addWidget(self.listView)
         layout.addWidget(self.barGraphView, 1)
@@ -162,15 +152,15 @@ class MainForm(QDialog):
         QTimer.singleShot(0, self.initialLoad)
 
     def initialLoad(self):
-        # Generate fake data
-        count = 20
-        self.model.insertRows(0, count - 1)
-        for row in range(count):
-            value = random.randint(1, 150)
-            color = QColor(random.randint(0, 255), random.randint(0, 255),
-                           random.randint(0, 255))
-            index = self.model.index(row)
+        data_block_slice = data_module.get_data_block_slice()
+        # 这边后面可以用栈的方式来实现最多展示多少个柱状
+        length = len(data_block_slice)
+        self.model.minValue, self.model.maxValue = data_module.get_attr_interval(data_block_slice, 'rsp')
+        self.model.insertRows(0, length - 1)
+        for idx in range(length):
+            data_block = data_block_slice[idx]
+            value = int(data_block.rsp)
+            color = QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+            index = self.model.index(idx)
             self.model.setData(index, value)
             self.model.setData(index, QVariant(color), Qt.UserRole)
-
-
