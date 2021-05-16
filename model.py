@@ -1,5 +1,5 @@
 class ShowInfo:
-    def __init__(self,task_id,stack_idx):
+    def __init__(self, task_id, stack_idx):
         self.task_id = task_id
         self.stack_idx = stack_idx
 
@@ -21,12 +21,16 @@ class StackInfo:
     def __init__(self):
         self.method_infos = []
 
-    def add_method_info(self, method, esp, ebp):
+    def add_method_info(self, esp, ebp, method):
         self.method_infos.append(MethodInfo(
             esp=esp,
             ebp=ebp,
             method=method,
         ))
+
+    def add_method_infos(self, method_info_list):
+        for method_info in method_info_list:
+            self.add_method_info(method_info.esp, method_info.ebp, method_info.method)
 
 
 class MethodInfo:

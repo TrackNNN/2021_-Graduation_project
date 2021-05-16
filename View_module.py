@@ -8,8 +8,8 @@ ColorList = [QColor(85, 239, 196), QColor(255, 234, 167), QColor(129, 236, 236)
     , QColor(250, 177, 160), QColor(255, 118, 117), QColor(116, 185, 255), QColor(253, 121, 168), QColor(178, 190, 195),
              QColor(45, 52, 54)
     , QColor(162, 155, 254)]
-TaskAttr = ["task_id", "task_esp", "task_ebp"]
-MethodAttr = ["method", "esp", "ebp"]
+TaskAttr = ["task_id", "task_ebp", "task_esp"]
+MethodAttr = ["method", "ebp", "esp"]
 ColNum = 3
 ItemDataMethodType = 1
 
@@ -26,6 +26,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.init_stack_info()
         self.show_current_data()
+        self.update_index_and_length()
 
     def init_stack_info(self):
         self.show_stack.setColumnCount(3)
@@ -49,12 +50,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if DataModel.ShowDataIndex < len(DataModel.ShowData) - 1:
             DataModel.ShowDataIndex += 1
         self.show_current_data()
+        self.update_index_and_length()
 
     def back_handler(self):
         self.clear_items()
         if DataModel.ShowDataIndex > 0:
             DataModel.ShowDataIndex -= 1
         self.show_current_data()
+        self.update_index_and_length()
 
     def show_current_data(self):
         data_dict = DataModel.get_task_info()
@@ -78,6 +81,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             position += ColNum
             stack_info_str += method_info_str + "\n"
         self.stack_info.setText(stack_info_str[:-1])
+        self.update_index_and_length()
 
     def show_stack_item_handler(self):
         item = self.show_stack.selectedItems()[0]
@@ -98,3 +102,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         font.setFamily("楷体")
         font.setPointSize(8)
         return font
+
+    def update_index_and_length(self):
+        self.index.setText(str(DataModel.ShowDataIndex+1))
+        self.length.setText(str(len(DataModel.ShowData)))

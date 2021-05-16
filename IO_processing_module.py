@@ -113,7 +113,7 @@ def set_method_names(f, data):
     method_names_list = data.get('method_names_list')
     if not method_names_list:
         method_names_list = []
-    method_names_list.append(method_names)
+    method_names_list.append(method_names[::-1])
     data['method_names_list'] = method_names_list
     return f, data
 
@@ -175,7 +175,7 @@ def process_all_info(data, all_info, symbol, sub_idx, add_idx):
                 class_attr_data_list = data.get(class_attr)
                 if class_attr_data_list is None:
                     class_attr_data_list = []
-                class_attr_data_list.append(attr_data)
+                class_attr_data_list.append(TransHex(attr_data))
                 # 更新数据
                 data[class_attr] = class_attr_data_list
     return data
@@ -185,8 +185,5 @@ def check_char(character, idx, begin, end):
     return end > idx >= begin and character != ' ' and character != '\n'
 
 
-def print_dict(data):
-    for attr, attr_data_list in data.items():
-        print(attr, ":")
-        for attr_data in attr_data_list:
-            print(attr_data)
+def TransHex(hex_str):
+    return str(hex(int(hex_str, 16)))

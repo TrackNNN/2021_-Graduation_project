@@ -7,6 +7,7 @@ ParseFileTime = 10
 
 def __main__():
     # 定时解析日志
+    pcs.ShowData, pcs.TaskDict = pcs.set_file_data(ParseFileMode)
     parse_log_thread = pcs.MyThread(ParseFileMode, ParseFileTime)
     parse_log_thread.start()
 

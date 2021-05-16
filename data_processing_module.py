@@ -5,8 +5,6 @@ import IO_processing_module as data_IO
 import model
 
 GdbPattern = "gdb"
-IntMin, IntMax = -sys.maxsize - 1, sys.maxsize
-ReservePercent = 0.15
 HexBase, DecBase = 16, 10
 ShowData = []
 ShowDataIndex = 0
@@ -50,9 +48,6 @@ def set_file_data(parse_pattern):
 
         task_id = task_data.get('task_id')
         now_esp, now_ebp = task_data.get('esp'), task_data.get('ebp')
-        stack_info = model.StackInfo()
-        for method_name in task_data.get('method_names'):
-            stack_info.add_method_info(method=method_name, esp=now_esp, ebp=now_ebp)  # todo
 
         # 获取对应的taskObj
         task_obj = LoadTaskDict.get(task_id)
@@ -62,6 +57,24 @@ def set_file_data(parse_pattern):
                 task_ebp=task_data.get('task_ebp'),
                 task_esp=task_data.get('task_esp'),
             )
+        last_stack_info = None
+        if task_obj.stack_infos:
+            last_stack_info = task_obj.stack_infos[-1]
+
+        stack_info = model.StackInfo()
+        method_names = task_data.get('method_names')
+        if last_stack_info:
+            stack_info.add_method_infos(last_stack_info.method_infos)
+            if len(last_stack_info.method_infos) > len(method_names):
+                stack_info.method_infos = stack_info.method_infos[:-1]
+            elif len(last_stack_info.method_infos) < len(method_names):
+                stack_info.add_method_info(now_esp, now_ebp, method_names[-1])
+        else:
+            # 目前了为了解决中断出现的情况
+            if len(method_names) > 1:
+                stack_info.add_method_info(str(hex(int(now_ebp, 16) - 8)), "0x0", method_names[0])
+            stack_info.add_method_info(now_esp, now_ebp, method_names[-1])
+
         # 添加当前栈的信息
         task_obj.add_stack_info(stack_info)
 
@@ -100,33 +113,6 @@ def get_attr_dict(data_dict, idx):
     return result
 
 
-def get_attr_min_max_value(data_block_slice, attr_name):
-    min_value = IntMax
-    max_value = IntMin
-    for data_block in data_block_slice:
-        value = getattr(data_block, attr_name)
-        min_value = min(min_value, value)
-        max_value = max(max_value, value)
-    return min_value, max_value
-
-
-def get_attr_interval(data_block_slice, attr_name):
-    min_value, max_value = get_attr_min_max_value(data_block_slice, attr_name)
-    reserve_value = int((max_value - min_value) * ReservePercent)
-    return min_value - reserve_value, max_value + reserve_value
-
-
-def print_attr(data_block_slice, attr_name):
-    for data_block in data_block_slice:
-        print(getattr(data_block, attr_name))
-
-
-def Str_Hex_To_Dec_Num(Hex_Str):
-    if Hex_Str[:2] == "0X":
-        Hex_Str = Hex_Str[2:]
-    return int(Hex_Str, HexBase)
-
-
 # 获取要展示的数据
 def get_task_info():
     show_info = ShowData[ShowDataIndex]
@@ -147,6 +133,6 @@ def build_show_info_resp(task, stack_info):
                 'esp': method_info.esp,
                 'method': method_info.method,
             }
-            for method_info in stack_info.method_infos[::-1]
+            for method_info in stack_info.method_infos
         ]
     }
