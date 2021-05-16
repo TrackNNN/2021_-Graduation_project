@@ -1,34 +1,19 @@
-# import sys
-#
-# from PyQt5.QtWidgets import QApplication
-# from View_module import MainForm
-#
-#
-# def __main__():
-#     app = QApplication(sys.argv)
-#     form = MainForm()
-#     form.resize(1200, 800)
-#     form.show()
-#     app.exec_()
+import data_processing_module as pcs
+from PyQt5.QtWidgets import QApplication
+import sys
+from View_module import MyWindow
+ParseFileMode = "gdb"
+ParseFileTime = 10
 
-# from PySide2.QtWidgets import QApplication
-# from PySide2.QtUiTools import QUiLoader
-#
-#
-# class StackGraph:
-#     def __init__(self):
-#         self.ui = QUiLoader().load('stack.ui')
-#         # 1 获取数据展示到UI上
-#         # 2 实现点击功能来进行图形的重新展示
-#         # 3 对于空白单位的填写
-#         # 4 中期检查报告编写
-#         # 5 PPT编写
-#
-# app = QApplication([])
-# stats = StackGraph()
-# stats.ui.show()
-# app.exec_()
+def __main__():
+    # 定时解析日志
+    parse_log_thread = pcs.MyThread(ParseFileMode, ParseFileTime)
+    parse_log_thread.start()
 
-import data_processing_module as IO_Module
+    app = QApplication(sys.argv)
+    myWin = MyWindow()
+    myWin.show()
+    sys.exit(app.exec_())
 
-IO_Module.get_data_block_slice("gdb")
+
+__main__()

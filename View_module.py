@@ -1,166 +1,100 @@
-import random
-from PyQt5.QtGui import QColor, QPainter, QPixmap
-from PyQt5.QtCore import QAbstractListModel, QModelIndex, QSize, QTimer, QVariant, Qt, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QHBoxLayout, QListView, QSpinBox, QStyledItemDelegate, QStyleOptionViewItem, \
-    QWidget
-import data_processing_module as data_module
+from PyQt5.QtWidgets import QHeaderView, QMainWindow, QTableWidgetItem
+from PyQt5.QtGui import QBrush, QColor
+
+from stack import *
+import data_processing_module as DataModel
+
+ColorList = [QColor(85, 239, 196), QColor(255, 234, 167), QColor(129, 236, 236)
+    , QColor(250, 177, 160), QColor(255, 118, 117), QColor(116, 185, 255), QColor(253, 121, 168), QColor(178, 190, 195),
+             QColor(45, 52, 54)
+    , QColor(162, 155, 254)]
+TaskAttr = ["task_id", "task_esp", "task_ebp"]
+MethodAttr = ["method", "esp", "ebp"]
+ColNum = 3
+ItemDataMethodType = 1
 
 
-class BarGraphModel(QAbstractListModel):
-    dataChanged = pyqtSignal(QModelIndex, QModelIndex)
-
-    def __init__(self):
-        super(BarGraphModel, self).__init__()
-        self.__data = []
-        self.__colors = {}
-        self.minValue = 0
-        self.maxValue = 0
-
-    def rowCount(self, index=QModelIndex()):
-        return len(self.__data)
-
-    def insertRows(self, row, count):
-        extra = row + count
-        if extra >= len(self.__data):
-            self.beginInsertRows(QModelIndex(), row, row + count - 1)
-            self.__data.extend([0] * (extra - len(self.__data) + 1))
-            self.endInsertRows()
-            return True
-        return False
-
-    def flags(self, index):
-        return QAbstractListModel.flags(self, index) | Qt.ItemIsEditable
-
-    def setData(self, index, value, role=Qt.DisplayRole):
-        row = index.row()
-        if not index.isValid() or 0 > row >= len(self.__data):
-            return False
-        changed = False
-        if role == Qt.DisplayRole:
-            value = value
-            self.__data[row] = value
-            if self.minValue > value:
-                self.minValue = value
-            if self.maxValue < value:
-                self.maxValue = value
-            changed = True
-        elif role == Qt.UserRole:
-            self.__colors[row] = value
-            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            self.dataChanged[QModelIndex, QModelIndex].emit(index, index)
-            changed = True
-        if changed:
-            # self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            self.dataChanged[QModelIndex, QModelIndex].emit(index, index)
-        return changed
-
-    def data(self, index, role=Qt.DisplayRole):
-        row = index.row()
-        if not index.isValid() or 0 > row >= len(self.__data):
-            return QVariant()
-        if role == Qt.DisplayRole:
-            return self.__data[row]
-        if role == Qt.UserRole:
-            return QVariant(self.__colors.get(row, QColor(Qt.red)))
-        if role == Qt.DecorationRole:
-            color = QColor(self.__colors.get(row, QColor(Qt.red)))
-            pixmap = QPixmap(20, 20)
-            pixmap.fill(color)
-            return QVariant(pixmap)
-        return QVariant()
-
-
-class BarGraphDelegate(QStyledItemDelegate):
-    def __init__(self, minimum=0, maximum=100, parent=None):
-        super(BarGraphDelegate, self).__init__(parent)
-        self.minimum = minimum
-        self.maximum = maximum
-
-    def paint(self, painter, option, index):
-        my_option = QStyleOptionViewItem(option)
-        my_option.displayAlignment |= (Qt.AlignRight | Qt.AlignVCenter)
-        QStyledItemDelegate.paint(self, painter, my_option, index)
-
-    def createEditor(self, parent, option, index):
-        spinbox = QSpinBox(parent)
-        spinbox.setRange(self.minimum, self.maximum)
-        spinbox.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        return spinbox
-
-    def setEditorData(self, editor, index):
-        value = index.model().data(index, Qt.DisplayRole)
-        editor.setValue(value)
-
-    def setModelData(self, editor, model, index):
-        editor.interpretText()
-        model.setData(index, editor.value())
-
-
-class BarGraphView(QWidget):
-    WIDTH = 20
-
+class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
-        super(BarGraphView, self).__init__(parent)
-        self.model = None
+        super(MyWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.retranslateUi(self)
 
-    def setModel(self, model):
-        self.model = model
-        self.model.dataChanged[QModelIndex, QModelIndex].connect(self.update)
-        self.model.modelReset.connect(self.update)
+        self.forward_button.clicked.connect(lambda: self.forward_handler())  # 单击运行
+        self.back_button.clicked.connect(lambda: self.back_handler())
+        self.show_stack.itemClicked.connect(self.show_stack_item_handler)
 
-    def sizeHint(self):
-        return self.minimumSizeHint()
+        self.init_stack_info()
+        self.show_current_data()
 
-    def minimumSizeHint(self):
-        if self.model is None:
-            return QSize(BarGraphView.WIDTH * 10, 100)
-        return QSize(BarGraphView.WIDTH * self.model.rowCount(), 100)
+    def init_stack_info(self):
+        self.show_stack.setColumnCount(3)
+        self.show_stack.setRowCount(10)
+        self.show_stack.verticalHeader().setVisible(False)
+        self.show_stack.horizontalHeader().setVisible(False)
+        self.show_stack.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.show_stack.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-    def paintEvent(self, event):
-        if self.model is None:
-            return
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        span = self.model.maxValue - self.model.minValue
-        painter.setWindow(0, 0, BarGraphView.WIDTH * self.model.rowCount(),
-                          span)
-        for row in range(self.model.rowCount()):
-            x = row * BarGraphView.WIDTH
-            index = self.model.index(row)
-            color = QColor(self.model.data(index, Qt.UserRole))
-            y = self.model.data(index)
-            painter.fillRect(x, span - y, BarGraphView.WIDTH, y, color)
+    def clear_items(self):
+        for i in range(0, 30):
+            item = QTableWidgetItem()
+            item.setBackground(QBrush(QColor(255, 255, 255)))
+            self.show_stack.setItem(0, i, item)
 
+    def get_color(self, idx):
+        return QBrush(ColorList[int(idx)])
 
-class MainForm(QDialog):
-    def __init__(self, parent=None):
-        super(MainForm, self).__init__(parent)
-        self.model = BarGraphModel()
-        self.barGraphView = BarGraphView()
-        self.barGraphView.setModel(self.model)
-        self.listView = QListView()
-        self.listView.setModel(self.model)
-        self.listView.setItemDelegate(BarGraphDelegate(0, 1000, self))
-        self.listView.setMaximumWidth(100)
-        self.listView.setEditTriggers(QListView.DoubleClicked | QListView.EditKeyPressed)
+    def forward_handler(self):
+        self.clear_items()
+        if DataModel.ShowDataIndex < len(DataModel.ShowData) - 1:
+            DataModel.ShowDataIndex += 1
+        self.show_current_data()
 
-        layout = QHBoxLayout()
-        layout.addWidget(self.listView)
-        layout.addWidget(self.barGraphView, 1)
-        self.setLayout(layout)
-        self.setWindowTitle("Bar Grapher")
-        QTimer.singleShot(0, self.initialLoad)
+    def back_handler(self):
+        self.clear_items()
+        if DataModel.ShowDataIndex > 0:
+            DataModel.ShowDataIndex -= 1
+        self.show_current_data()
 
-    def initialLoad(self):
-        data_block_slice = data_module.get_data_block_slice()
-        # 这边后面可以用栈的方式来实现最多展示多少个柱状
-        length = len(data_block_slice)
-        self.model.minValue, self.model.maxValue = data_module.get_attr_interval(data_block_slice, 'rsp')
-        self.model.insertRows(0, length - 1)
-        for idx in range(length):
-            data_block = data_block_slice[idx]
-            value = int(data_block.rsp)
-            color = QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-            index = self.model.index(idx)
-            self.model.setData(index, value)
-            self.model.setData(index, QVariant(color), Qt.UserRole)
+    def show_current_data(self):
+        data_dict = DataModel.get_task_info()
+        # 展示数据到task_info框中
+        self.task_info.setText(self.build_attr_str(data_dict, TaskAttr, ": ", "\n"))
+
+        position = 1
+        stack_info_str = ""
+        method_infos = data_dict.get('method_infos')
+        for method_dict in method_infos:
+            item = QTableWidgetItem()
+            # 设置字体
+            item.setFont(self.get_my_font())
+            # 设置背景颜色
+            item.setBackground(self.get_color(position / ColNum))
+            # 给每一个item设置当前函数数据
+            method_info_str = self.build_attr_str(method_dict, MethodAttr, ": ", "\n")
+            item.setData(ItemDataMethodType, method_info_str)
+            item.setText(method_dict.get('method'))
+            self.show_stack.setItem(0, position, item)
+            position += ColNum
+            stack_info_str += method_info_str + "\n"
+        self.stack_info.setText(stack_info_str[:-1])
+
+    def show_stack_item_handler(self):
+        item = self.show_stack.selectedItems()[0]
+        method_text = item.data(ItemDataMethodType)
+        if method_text:
+            self.method_info.setText(method_text)
+
+    def build_attr_str(self, data_dict, attr_list, cat_symbol, end_symbol):
+        ret_str = ""
+        for attr in attr_list:
+            value = data_dict.get(attr)
+            if value:
+                ret_str = ret_str + attr + cat_symbol + str(value) + end_symbol
+        return ret_str
+
+    def get_my_font(self):
+        font = QtGui.QFont()
+        font.setFamily("楷体")
+        font.setPointSize(8)
+        return font
