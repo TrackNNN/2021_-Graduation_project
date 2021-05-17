@@ -45,17 +45,17 @@ def set_file_data(parse_pattern):
     LoadTaskDict = {}
     for idx in range(record_nums):
         task_data = get_attr_dict(file_data, idx)
-
         task_id = task_data.get('task_id')
-        now_esp, now_ebp = task_data.get('esp'), task_data.get('ebp')
+        now_esp = task_data.get('esp')
+        now_ebp = task_data.get('ebp')
+        now_task_ebp = task_data.get('task_ebp')
+        now_task_esp = task_data.get('task_esp')
 
         # 获取对应的taskObj
         task_obj = LoadTaskDict.get(task_id)
         if not task_obj:
             task_obj = model.Task(
                 task_id=task_id,
-                task_ebp=task_data.get('task_ebp'),
-                task_esp=task_data.get('task_esp'),
             )
         last_stack_info = None
         if task_obj.stack_infos:
@@ -68,12 +68,13 @@ def set_file_data(parse_pattern):
             if len(last_stack_info.method_infos) > len(method_names):
                 stack_info.method_infos = stack_info.method_infos[:-1]
             elif len(last_stack_info.method_infos) < len(method_names):
-                stack_info.add_method_info(now_esp, now_ebp, method_names[-1])
+                stack_info.add_method_info(now_task_esp, now_task_ebp, now_esp, now_ebp, method_names[-1])
         else:
             # 目前了为了解决中断出现的情况
             if len(method_names) > 1:
-                stack_info.add_method_info(str(hex(int(now_ebp, 16) - 8)), "0x0", method_names[0])
-            stack_info.add_method_info(now_esp, now_ebp, method_names[-1])
+                stack_info.add_method_info(now_task_esp, now_task_ebp, str(hex(int(now_ebp, 16) - 8)), "0x0",
+                                           method_names[0])
+            stack_info.add_method_info(now_task_esp, now_task_ebp, now_esp, now_ebp, method_names[-1])
 
         # 添加当前栈的信息
         task_obj.add_stack_info(stack_info)
@@ -125,10 +126,10 @@ def get_task_info():
 def build_show_info_resp(task, stack_info):
     return {
         "task_id": task.task_id,
-        "task_ebp": task.task_ebp,
-        "task_esp": task.task_esp,
         "method_infos": [
             {
+                "task_ebp": method_info.task_ebp,
+                "task_esp": method_info.task_esp,
                 'ebp': method_info.ebp,
                 'esp': method_info.esp,
                 'method': method_info.method,
