@@ -1,16 +1,20 @@
-import sys
-
+import data_processing_module as pcs
 from PyQt5.QtWidgets import QApplication
-from View_module import MainForm
+import sys
+from View_module import MyWindow
+ParseFileMode = "gdb"
+ParseFileTime = 10
 
-app = QApplication(sys.argv)
-form = MainForm()
-form.resize(1200, 800)
-form.show()
-app.exec_()
+def __main__():
+    # 定时解析日志
+    pcs.ShowData, pcs.TaskDict = pcs.set_file_data(ParseFileMode)
+    parse_log_thread = pcs.MyThread(ParseFileMode, ParseFileTime)
+    parse_log_thread.start()
 
-# import data_processing_module  as data_module
-#
-# Slice = data_module.get_display_data_block_slice()
-# data_module.print_attr(Slice, "rsp")
-# print(data_module.get_attr_min_max_value(Slice, 'rsp'))
+    app = QApplication(sys.argv)
+    myWin = MyWindow()
+    myWin.show()
+    sys.exit(app.exec_())
+
+
+__main__()
