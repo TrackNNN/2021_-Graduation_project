@@ -1,3 +1,4 @@
+import json
 import sys
 import threading
 import time
@@ -52,28 +53,40 @@ def set_file_data(parse_pattern):
         now_task_esp = task_data.get('task_esp')
 
         # 获取对应的taskObj
-        task_obj = LoadTaskDict.get(task_id)
-        if not task_obj:
-            task_obj = model.Task(
-                task_id=task_id,
-            )
-        last_stack_info = None
-        if task_obj.stack_infos:
-            last_stack_info = task_obj.stack_infos[-1]
+        task_obj = LoadTaskDict.get(task_id) or model.Task(task_id=task_id)
+        last_stack_info = task_obj.stack_infos[-1] if task_obj.stack_infos else None
 
+        remake = True
+        last_method_list = None
         stack_info = model.StackInfo()
         method_names = task_data.get('method_names')
         if last_stack_info:
-            stack_info.add_method_infos(last_stack_info.method_infos)
-            if len(last_stack_info.method_infos) > len(method_names):
-                stack_info.method_infos = stack_info.method_infos[:-1]
-            elif len(last_stack_info.method_infos) < len(method_names):
-                stack_info.add_method_info(now_task_esp, now_task_ebp, now_esp, now_ebp, method_names[-1])
+            last_method_list = [method_info for method_info in last_stack_info.method_infos]
+
+            method_len = len(method_names)
+            stack_len = len(last_method_list)
+
+            if stack_len - 1 == method_len and last_method_list[-2].method == method_names[-1]:
+                last_method_list = last_method_list[:-1]
+                remake = False
+            elif stack_len + 1 == method_len and last_method_list[-1].method == method_names[-2]:
+                last_method_list.append(
+                    model.MethodInfo(now_task_esp, now_task_ebp, now_esp, now_ebp, method_names[-1]))
+                remake = False
+
+        if not remake:
+            stack_info.add_method_infos(last_method_list)
         else:
-            # 目前了为了解决中断出现的情况
             if len(method_names) > 1:
-                stack_info.add_method_info(now_task_esp, now_task_ebp, str(hex(int(now_ebp, 16) - 8)), "0x0",
-                                           method_names[0])
+                make_ebp = "0x0"
+                if len(method_names) > 2:
+                    for method_idx in range(len(method_names) - 2):
+                        stack_info.add_method_info(now_task_esp, now_task_ebp, "unkown", make_ebp,
+                                                   method_names[method_idx])
+                        make_ebp = "unkown"
+
+                stack_info.add_method_info(now_task_esp, now_task_ebp, str(hex(int(now_ebp, 16) - 8)), make_ebp,
+                                           method_names[-2])
             stack_info.add_method_info(now_task_esp, now_task_ebp, now_esp, now_ebp, method_names[-1])
 
         # 添加当前栈的信息
@@ -137,3 +150,14 @@ def build_show_info_resp(task, stack_info):
             for method_info in stack_info.method_infos
         ]
     }
+
+
+def print_method_info(method_info):
+    attr_list = ["task_esp", "task_ebp", "esp", "ebp", "method"]
+    for attr in attr_list:
+        print(attr, getattr(method_info, attr), end=" . ")
+    print()
+
+
+def indent_print(data):
+    print(json.dumps(data, indent=4))
