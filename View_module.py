@@ -63,7 +63,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def show_current_data(self):
         data_dict = DataModel.get_task_info()
-        print(data_dict)
         task_id_str = "task_id: " + data_dict.get('task_id') + "\n"
 
         position = 1

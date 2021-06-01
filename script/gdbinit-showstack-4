@@ -1,0 +1,350 @@
+file bin/bootpack.out
+# add-symbol-file /home/moocos/c/30daysall/tolset/harib27f/haribote/umake/bin/bootpack.out 0x280000
+target remote :1234
+
+# set charset GB2312
+set print pretty on
+source tools/gdbfunc
+set pagination off
+
+set logging file debuginfo/30days-stack_alloc.txt
+set logging on
+printf "begin show stack\n"
+d br
+
+b console.c:94
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:216
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:304
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:391
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:365
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b mtask.c:121
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+
+b bootpack.c:379
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b fifo.c:17
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:380
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:393
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:315
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:227
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:99
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+
+# dir过程
+b console.c:212
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:275
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+
+# exit 过程
+b console.c:214
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:286
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b timer.c:124
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:288
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+
+b memory.c:158
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b memory.c:86
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b memory.c:159
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b console.c:297
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+# 关闭控制台
+b bootpack.c:332
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:410
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:412
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:400
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:401
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:402
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
+
+b bootpack.c:413
+commands
+printf "----------------back_trace---------------\n"
+bt
+printf "----------------back_trace---------------\n"
+regx86
+set $nowtask=(struct TASK *)(taskctl->level[taskctl->now_lv]).tasks[(taskctl->level[taskctl->now_lv]).now]
+p/x *$nowtask
+c
+end
