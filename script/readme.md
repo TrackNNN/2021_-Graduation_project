@@ -45,7 +45,7 @@ mkdir tools debuginfo tmp
 * 首先在umake目录下   ./startdebug_showstack，启动GDB调试操作系统。
 * 然后将初始化的日志删除掉，然后按照下面的操作来生成日志
 * 产生日志之后，在可视化程序的terminal > python main.py，启动程序读取处理可视化日志。
-
+第一次加载可能有点慢，因为要加载包。
 
 
 1 进程创建
