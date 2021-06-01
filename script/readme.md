@@ -24,12 +24,27 @@ gdbinit-showstack是放到haribote的 umake/tools 文件夹的脚本，这边放
 4 操作
 
 * 修改makefile文件，默认是没有stack脚本的。
-  * 
+
+![image-20210602021615171](readme.assets/image-20210602021615171.png)
+
+```shell
+debug-showstack: $(KERNELIMG)
+		$(V)$(QEMU) -S -s -parallel stdio $(QEMUOPTS) -serial null &
+		$(V)sleep 2
+		$(V)$(TERMINAL) -e "$(GDB) -q -x tools/gdbinit-showstack"
+```
+
+* 创建  tools debuginfo tmp 文件夹（$haribotePath/umake目录下）
+
+```
+mkdir tools debuginfo tmp
+```
+
 * 将对应的脚本文件名字改成gdbinit-showstack，放到 $haribotePath/umake/tools（$haribotePath是操作系统路径）
 
-* 首先在umake系统目录下   ./startdebug_showstack，启动GDB调试操作系统。
+* 首先在umake目录下   ./startdebug_showstack，启动GDB调试操作系统。
 * 然后将初始化的日志删除掉，然后按照下面的操作来生成日志
-* 产生日志之后，在程序的terminal > python main.py
+* 产生日志之后，在可视化程序的terminal > python main.py，启动程序读取处理可视化日志。
 
 
 
