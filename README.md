@@ -98,9 +98,21 @@ pip install -r requirements.txt
 
 
 
+共享文件
+
+需要共享的文件的指令是
+
+sudo mount -t  vboxsf shareFloder  /home/osdesign/shareFloder  
+
+sudo mount -t vboxsf debugInfo /home/osdesign/newdisk/umake/debuginfo
+
+sudo mount -t vboxsf tool /home/osdesign/newdisk/umake/tools
+
+对应的栈数据存放的地址要填写到工程的 IO_processing_module.py 的 gdb_log_path
 
 
-操作过程
+
+**操作过程**
 
 
 
@@ -116,9 +128,26 @@ pip install -r requirements.txt
 
 
 
+
+
+清空初始化的数据
+
+![image-20210602184214863](README.assets/image-20210602184214863.png)
+
+
+
 选择qemu，输入对应的指令
 
 ![image-20210602172854962](README.assets/image-20210602172854962.png)
 
 
 
+这时候存放日志的文件加载新的数据：
+
+![image-20210602184334473](README.assets/image-20210602184334473.png)
+
+
+
+启动可视化
+
+![image-20210602184432390](README.assets/image-20210602184432390.png)
