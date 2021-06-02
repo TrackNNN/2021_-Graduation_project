@@ -96,3 +96,29 @@ pip install -r requirements.txt
 
 运行脚本获取日志之后再运行本程序，脚本的说明文件在 ./script/readme.md（当前目录下的script文件夹）
 
+
+
+
+
+操作过程
+
+
+
+到对应的目录下
+
+![image-20210602172639175](README.assets/image-20210602172639175.png)
+
+
+
+启动脚本
+
+![image-20210602172747001](README.assets/image-20210602172747001.png)
+
+
+
+选择qemu，输入对应的指令
+
+![image-20210602172854962](README.assets/image-20210602172854962.png)
+
+
+

@@ -52,25 +52,20 @@ mkdir tools debuginfo tmp
 
 脚本文件gdbinit-showstack-1，按照4操作进行。
 
-点击shift+f2，生成一个新的控制台，会产生进程创建过程日志。
-
-2 进程中断
+命令行输入start exit，生成一个新的控制台，会产生进程创建过程日志，然后exit退出进程。
 
 
+2 进程销毁
 
-
-
-3 进程销毁
-
-脚本文件gdbinit-showstack-3，按照4操作进行。
+脚本文件gdbinit-showstack-2，按照4操作进行。
 
 在命令行输入 exit，产生进程销毁的日志。
 
 
 
-4 进程创建->进程切换->执行DIR指令->进程销毁->进程切换内核态。
+3 进程创建->进程切换->执行DIR指令->进程销毁->进程切换内核态。
 
-脚本文件gdbinit-showstack-4
+脚本文件gdbinit-showstack-3
 
 1 在第一个命令行输入  start dir
 
