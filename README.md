@@ -72,7 +72,7 @@ git clone git@github.com:TrackNNN/2021_Graduation_project.git
 
 2 解压。
 
-直接将file.rar的文件都解压后放到当前虚拟环境目录。
+直接将stack_project.zip的文件都解压后放到当前虚拟环境目录。
 
 
 
